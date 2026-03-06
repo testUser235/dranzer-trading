@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dranzer Trading</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #f5f5f5;
+    color: #222;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 14px;
+  }
+
+  nav {
+    background: #fff;
+    border-bottom: 1px solid #ddd;
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .logo { font-weight: 700; font-size: 16px; color: #222; }
+
+  .tabs { display: flex; gap: 4px; }
+
+  .tab {
+    padding: 7px 16px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background: #fff;
+    color: #555;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .tab:hover { background: #f0f0f0; }
+  .tab.active { background: #222; color: #fff; border-color: #222; }
+
+  .page { display: none; padding: 24px; max-width: 1100px; margin: 0 auto; }
+  .page.active { display: block; }
+
+  h2 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+  .sub { color: #777; font-size: 13px; margin-bottom: 20px; }
+
+  .card {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+  }
+
+  .field label {
+    display: block;
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+  .opt { color: #bbb; font-weight: 400; }
+
+  .wrap { position: relative; }
+  .wrap span {
+    position: absolute; left: 10px; top: 50%;
+    transform: translateY(-50%); color: #aaa; pointer-events: none;
+  }
+
+  input[type="number"] {
+    width: 100%;
+    padding: 9px 10px 9px 26px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    -moz-appearance: textfield;
+  }
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+  input[type="number"]:focus { border-color: #888; }
+
+  .btn { margin-top: 16px; padding: 10px 24px; background: #222; color: #fff; border: none; border-radius: 6px; font-size: 14px; font-family: inherit; font-weight: 600; cursor: pointer; }
+  .btn:hover { background: #444; }
+  .btn-reset { background: #fff; color: #555; border: 1px solid #ccc; margin-left: 8px; }
+  .btn-reset:hover { background: #f5f5f5; }
+
+  .summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .sc {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+  .sc-lbl { font-size: 11px; color: #888; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.4px; }
+  .sc-val { font-size: 18px; font-weight: 700; color: #222; }
+  .sc-val.red { color: #c00; }
+  .sc-val.grn { color: #060; }
+
+  .tbl-card {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .tbl-hdr {
+    padding: 14px 18px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .tbl-hdr strong { font-size: 14px; }
+  .tbl-note { font-size: 12px; color: #888; }
+  .tbl-wrap { overflow-x: auto; }
+
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    background: #f9f9f9;
+    padding: 10px 14px;
+    text-align: right;
+    font-size: 12px;
+    color: #666;
+    font-weight: 600;
+    border-bottom: 1px solid #eee;
+    white-space: nowrap;
+  }
+  thead th:first-child { text-align: left; }
+  tbody td {
+    padding: 11px 14px;
+    text-align: right;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 13px;
+    color: #333;
+    white-space: nowrap;
+  }
+  tbody td:first-child { text-align: left; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: #fafafa; }
+
+  .red { color: #c00; }
+  .grn { color: #060; }
+  .bold { font-weight: 600; color: #222; }
+
+  .badge {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    vertical-align: middle;
+    margin-left: 5px;
+  }
+  .b-now { background: #eef; color: #557; }
+  .b-be  { background: #fffbe6; color: #a60; border: 1px solid #e8cc70; }
+
+  .be-row td { background: #fffdf0; }
+  .now-row td { background: #f5f5ff; }
+
+  .hidden { display: none; }
+
+  /* Price targets */
+  .tgt-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 14px;
+  }
+  .tgt-card {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 18px 16px;
+    text-align: center;
+  }
+  .tgt-pct { font-size: 12px; font-weight: 600; margin-bottom: 10px; letter-spacing: 0.3px; }
+  .tgt-price { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+  .tgt-chg { font-size: 12px; color: #888; }
+
+  @media (max-width: 600px) {
+    nav { padding: 10px 14px; }
+    .page { padding: 14px; }
+    .tab { padding: 6px 10px; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">Dranzer Trading</div>
+  <div class="tabs">
+    <button class="tab active" onclick="showPage('tgt')">Price Targets</button>
+    <button class="tab" onclick="showPage('neg')">Negative</button>
+    <button class="tab" onclick="showPage('pos')">Positive</button>
+  </div>
+</nav>
+
+<!-- PRICE TARGETS -->
+<div class="page active" id="page-tgt">
+  <h2>Price Targets</h2>
+  <p class="sub">Enter a price to instantly see key target levels</p>
+
+  <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:stretch;margin-bottom:20px;">
+
+    <!-- Input Card -->
+    <div class="card" style="flex:1;min-width:280px;display:flex;flex-direction:column;">
+      <div class="field">
+        <label>Stock Price</label>
+        <div class="wrap"><span>₹</span><input type="number" id="tp" placeholder="100" min="0.01" step="0.01" oninput="calcTargets()"></div>
+      </div>
+      <p style="margin-top:10px;font-size:12px;color:#aaa;">Updates as you type</p>
+      <div style="margin-top:14px;padding:12px 14px;background:#fff3f3;border:1px solid #ffcdd2;border-left:4px solid #e53935;border-radius:6px;">
+        <p style="font-size:13px;font-weight:700;color:#c62828;margin-bottom:4px;">🔔 Reminder</p>
+        <p style="font-size:13px;color:#b71c1c;line-height:1.5;">Every time you place an order, make sure to update both the <strong>Trigger Price</strong> and <strong>Price</strong> fields for your <strong>Stop Loss</strong> and <strong>Target</strong> orders accordingly.</p>
+      </div>
+      <button class="btn btn-reset" onclick="resetTgt()" style="margin-top:auto;padding-top:12px;">Reset</button>
+    </div>
+
+    <!-- Dynamic Diagram Card -->
+    <div class="card" style="flex:1;min-width:280px;display:flex;flex-direction:column;" id="tgt-diagram">
+      <p style="font-size:13px;font-weight:700;color:#222;margin-bottom:16px;">📊 Stop Loss & Target Diagram</p>
+
+      <div style="position:relative;padding:0 16px;flex:1;display:flex;flex-direction:column;justify-content:space-between;">
+        <div style="position:absolute;left:50%;top:0;bottom:0;width:2px;background:#ddd;transform:translateX(-50%);"></div>
+
+        <!-- TARGET row -->
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="flex:1;text-align:right;">
+            <div style="font-size:11px;color:#060;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;">Target Price</div>
+            <div style="font-size:20px;font-weight:800;color:#060;" id="diag-target">₹200.00</div>
+            <div style="font-size:11px;color:#888;">+100%  ✅</div>
+          </div>
+          <div style="width:14px;height:14px;border-radius:50%;background:#060;border:2px solid #fff;box-shadow:0 0 0 2px #060;flex-shrink:0;z-index:1;"></div>
+          <div style="flex:1;">
+            <div style="font-size:11px;color:#060;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;">Trigger Price</div>
+            <div style="font-size:18px;font-weight:700;color:#2e7d32;" id="diag-target-trigger">₹204.00</div>
+            <div style="font-size:11px;color:#888;">+104%  🔔</div>
+          </div>
+        </div>
+
+        <div style="text-align:center;color:#060;font-size:18px;">↑</div>
+
+        <!-- BUY row -->
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="flex:1;text-align:right;">
+            <div style="font-size:11px;color:#555;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;">Buy Price</div>
+            <div style="font-size:22px;font-weight:800;color:#222;" id="diag-buy">₹100.00</div>
+            <div style="font-size:11px;color:#888;">Entry point 📍</div>
+          </div>
+          <div style="width:16px;height:16px;border-radius:50%;background:#222;border:2px solid #fff;box-shadow:0 0 0 2px #222;flex-shrink:0;z-index:1;"></div>
+          <div style="flex:1;">
+            <div style="font-size:12px;color:#555;line-height:1.5;">Place <strong>SL</strong> and <strong>Target</strong> order immediately after buying</div>
+          </div>
+        </div>
+
+        <div style="text-align:center;color:#c00;font-size:18px;">↓</div>
+
+        <!-- SL row -->
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="flex:1;text-align:right;">
+            <div style="font-size:11px;color:#c00;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;">Stop Loss Price</div>
+            <div style="font-size:20px;font-weight:800;color:#c00;" id="diag-sl">₹75.00</div>
+            <div style="font-size:11px;color:#888;">-25%  🛑</div>
+          </div>
+          <div style="width:14px;height:14px;border-radius:50%;background:#c00;border:2px solid #fff;box-shadow:0 0 0 2px #c00;flex-shrink:0;z-index:1;"></div>
+          <div style="flex:1;">
+            <div style="font-size:11px;color:#c00;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;">Trigger Price</div>
+            <div style="font-size:18px;font-weight:700;color:#c62828;" id="diag-sl-trigger">₹79.00</div>
+            <div style="font-size:11px;color:#888;">-21%  🔔</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:16px;padding-top:14px;border-top:1px solid #eee;">
+        <div style="font-size:12px;color:#555;line-height:1.6;">
+          <strong>Trigger Price</strong> — Price at which broker activates the order.<br>
+          <strong>SL / Target Price</strong> — Actual price at which order executes.<br>
+          <span style="color:#c00;">⚠️ Trigger must be above SL and below Target.</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div id="tgt-res" class="hidden">
+    <div class="tgt-grid" id="tgt-cards"></div>
+  </div>
+</div>
+
+<!-- NEGATIVE -->
+<div class="page" id="page-neg">
+  <h2>Negative Averaging</h2>
+  <p class="sub">Stock is down — calculate how much to invest to reduce your loss</p>
+
+  <div class="card">
+    <div class="grid">
+      <div class="field">
+        <label>Original Buy Price</label>
+        <div class="wrap"><span>₹</span><input type="number" id="nb" placeholder="464" min="0.01" step="0.01"></div>
+      </div>
+      <div class="field">
+        <label>Total Amount Invested</label>
+        <div class="wrap"><span>₹</span><input type="number" id="ni" placeholder="76000" min="0"></div>
+      </div>
+      <div class="field">
+        <label>Current Market Price (CMP)</label>
+        <div class="wrap"><span>₹</span><input type="number" id="nc" placeholder="354" min="0.01" step="0.01"></div>
+      </div>
+      <div class="field">
+        <label>Available Amount <span class="opt">(optional)</span></label>
+        <div class="wrap"><span>₹</span><input type="number" id="na" placeholder="Leave empty to see ₹ needed" min="0"></div>
+      </div>
+    </div>
+    <button class="btn" onclick="calcNeg()">Calculate</button>
+    <button class="btn btn-reset" onclick="resetNeg()">Reset</button>
+  </div>
+
+  <div id="neg-res" class="hidden">
+    <div class="summary" id="neg-sum"></div>
+    <div class="tbl-card">
+      <div class="tbl-hdr">
+        <strong id="neg-ttl">Recovery Table</strong>
+        <span class="tbl-note" id="neg-note"></span>
+      </div>
+      <div class="tbl-wrap">
+        <table><thead><tr id="neg-th"></tr></thead><tbody id="neg-tb"></tbody></table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- POSITIVE -->
+<div class="page" id="page-pos">
+  <h2>Positive Averaging</h2>
+  <p class="sub">Stock is up — see how adding more affects your returns</p>
+
+  <div class="card">
+    <div class="grid">
+      <div class="field">
+        <label>Original Buy Price</label>
+        <div class="wrap"><span>₹</span><input type="number" id="pb" placeholder="100" min="0.01" step="0.01"></div>
+      </div>
+      <div class="field">
+        <label>Total Amount Invested</label>
+        <div class="wrap"><span>₹</span><input type="number" id="pi" placeholder="10000" min="0"></div>
+      </div>
+      <div class="field">
+        <label>Current Market Price (CMP)</label>
+        <div class="wrap"><span>₹</span><input type="number" id="pc" placeholder="200" min="0.01" step="0.01"></div>
+      </div>
+      <div class="field">
+        <label>Available Amount <span class="opt">(optional)</span></label>
+        <div class="wrap"><span>₹</span><input type="number" id="pa" placeholder="Leave empty to see ₹ needed" min="0"></div>
+      </div>
+    </div>
+    <button class="btn" onclick="calcPos()">Calculate</button>
+    <button class="btn btn-reset" onclick="resetPos()">Reset</button>
+  </div>
+
+  <div id="pos-res" class="hidden">
+    <div class="summary" id="pos-sum"></div>
+    <div class="tbl-card">
+      <div class="tbl-hdr">
+        <strong id="pos-ttl">Profit Table</strong>
+        <span class="tbl-note" id="pos-note"></span>
+      </div>
+      <div class="tbl-wrap">
+        <table><thead><tr id="pos-th"></tr></thead><tbody id="pos-tb"></tbody></table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- (Price Targets page is now first above) -->
+
+<script>
+const PAGES = ['tgt','neg','pos'];
+
+function showPage(p) {
+  PAGES.forEach(id => {
+    document.getElementById('page-' + id).classList.remove('active');
+    document.querySelectorAll('.tab')[PAGES.indexOf(id)].classList.remove('active');
+  });
+  document.getElementById('page-' + p).classList.add('active');
+  document.querySelectorAll('.tab')[PAGES.indexOf(p)].classList.add('active');
+}
+
+function fmt(n, d=2) { return '₹' + n.toLocaleString('en-IN',{minimumFractionDigits:d,maximumFractionDigits:d}); }
+function rn(n, d=2)  { return n.toLocaleString('en-IN',{minimumFractionDigits:d,maximumFractionDigits:d}); }
+function rs(n)        { return Math.floor(n).toLocaleString('en-IN'); }
+
+function resetNeg() {
+  ['nb','ni','nc','na'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('neg-res').classList.add('hidden');
+}
+function resetPos() {
+  ['pb','pi','pc','pa'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('pos-res').classList.add('hidden');
+}
+function resetTgt() {
+  document.getElementById('tp').value = '';
+  document.getElementById('tgt-res').classList.add('hidden');
+}
+
+function sc(label, val, cls='') {
+  return `<div class="sc"><div class="sc-lbl">${label}</div><div class="sc-val ${cls}">${val}</div></div>`;
+}
+
+// ===== NEGATIVE =====
+function calcNeg() {
+  const buy  = parseFloat(document.getElementById('nb').value);
+  const inv  = parseFloat(document.getElementById('ni').value);
+  const cmp  = parseFloat(document.getElementById('nc').value);
+  const aRaw = document.getElementById('na').value.trim();
+  const av   = aRaw !== '' ? parseFloat(aRaw) : null;
+
+  if (!buy || !inv || !cmp) { alert('Fill Buy Price, Amount Invested and CMP.'); return; }
+  if (cmp >= buy) { alert('CMP must be below Buy Price for negative averaging.'); return; }
+
+  const os   = inv / buy;
+  const cv   = os * cmp;
+  const pnl  = ((cmp - buy) / buy) * 100;
+  const pnlr = cv - inv;
+
+  document.getElementById('neg-sum').innerHTML =
+    sc('Shares Owned', rs(os)) +
+    sc('Current Value', fmt(cv), 'red') +
+    sc('Unrealised P&L', fmt(pnlr), 'red') +
+    sc('Current P&L', rn(pnl) + '%', 'red') +
+    (av !== null
+      ? sc('Shares Buyable Now', rs(Math.floor(av/cmp))) + sc('Available Capital', fmt(av))
+      : sc('Buy Price', fmt(buy)) + sc('CMP', fmt(cmp)));
+
+  const th = document.getElementById('neg-th');
+  const tb = document.getElementById('neg-tb');
+  tb.innerHTML = '';
+
+  if (av !== null) {
+    // Mode A — single result: invest available amount at CMP right now
+    const sb   = Math.floor(av / cmp);
+    const tot  = os + sb;
+    const tInv = inv + av;
+    const avg  = tInv / tot;
+    const pv   = tot * cmp;
+    const pp   = ((cmp - avg) / avg) * 100;
+    const dr   = ((cmp - buy) / buy) * 100;
+
+    document.getElementById('neg-note').textContent = 'Result of investing ₹' + rn(av) + ' at current CMP of ' + fmt(cmp);
+    th.innerHTML = '';
+    tb.innerHTML = '';
+    document.querySelector('#neg-res .tbl-card').style.display = 'none';
+    document.getElementById('neg-sum').innerHTML +=
+      sc('Shares You Can Buy', rs(sb) + ' shares') +
+      sc('Total Shares After', rs(tot)) +
+      sc('New Avg Cost', fmt(avg)) +
+      sc('Portfolio Value', fmt(pv)) +
+      sc('New P&L %', (pp >= 0 ? '+' : '') + rn(pp) + '%', pp >= 0 ? 'grn' : 'red') +
+      sc('Drop from Buy', rn(dr) + '%', 'red');
+
+  } else {
+    // Mode B — show ₹ needed to reach each loss target
+    document.querySelector('#neg-res .tbl-card').style.display = '';
+    document.getElementById('neg-note').textContent = 'How much to invest at CMP to reduce loss to each target';
+    th.innerHTML = `<th>Target Loss</th><th>₹ to Invest at CMP</th><th>Shares to Buy</th><th>Total Shares</th><th>New Avg Cost</th><th>Resulting P&L</th>`;
+
+    const start = Math.ceil(Math.abs(pnl));
+    const targets = [];
+    let t = Math.floor(start / 5) * 5;
+    if (t === 0) t = 5;
+    while (t >= 5) { targets.push(t); t -= 5; }
+    targets.push(0);
+
+    targets.forEach(tl => {
+      if (tl === 0) {
+        const tr = document.createElement('tr');
+        tr.classList.add('be-row');
+        tr.innerHTML = `<td class="bold">0% <span class="badge b-be">Break-even</span></td>
+          <td colspan="5" style="color:#999;font-size:12px;">Stock must recover to ${fmt(buy)} — buying at CMP cannot achieve break-even</td>`;
+        tb.appendChild(tr);
+        return;
+      }
+
+      const reqAvg = cmp / (1 - tl / 100);
+      if (reqAvg > buy || reqAvg <= cmp) return;
+
+      const num   = reqAvg * os - inv;
+      const den   = 1 - reqAvg / cmp;
+      if (den === 0) return;
+      const extra = num / den;
+      if (extra < 0) return;
+
+      const eS   = extra / cmp;
+      const totS = os + eS;
+      const totI = inv + extra;
+      const na   = totI / totS;
+      const ap   = ((cmp - na) / na) * 100;
+
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td class="red bold">-${tl}%</td>
+        <td class="bold">${fmt(extra)}</td>
+        <td>${rs(eS)}</td>
+        <td>${rs(totS)}</td>
+        <td>${fmt(na)}</td>
+        <td class="${ap >= 0 ? 'grn' : 'red'}">${rn(ap)}%</td>`;
+      tb.appendChild(tr);
+    });
+  }
+
+  document.getElementById('neg-res').classList.remove('hidden');
+  document.getElementById('neg-res').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ===== POSITIVE =====
+function calcPos() {
+  const buy  = parseFloat(document.getElementById('pb').value);
+  const inv  = parseFloat(document.getElementById('pi').value);
+  const cmp  = parseFloat(document.getElementById('pc').value);
+  const aRaw = document.getElementById('pa').value.trim();
+  const av   = aRaw !== '' ? parseFloat(aRaw) : null;
+
+  if (!buy || !inv || !cmp) { alert('Fill Buy Price, Amount Invested and CMP.'); return; }
+  if (cmp <= buy) { alert('CMP must be above Buy Price for positive averaging.'); return; }
+
+  const os   = inv / buy;
+  const cv   = os * cmp;
+  const pnl  = ((cmp - buy) / buy) * 100;
+  const pnlr = cv - inv;
+
+  document.getElementById('pos-sum').innerHTML =
+    sc('Shares Owned', rs(os)) +
+    sc('Current Value', fmt(cv), 'grn') +
+    sc('Unrealised Profit', fmt(pnlr), 'grn') +
+    sc('Current Return', '+' + rn(pnl) + '%', 'grn') +
+    (av !== null
+      ? sc('Shares Buyable Now', rs(Math.floor(av/cmp))) + sc('Available Capital', fmt(av))
+      : sc('Buy Price', fmt(buy)) + sc('CMP', fmt(cmp)));
+
+  const th = document.getElementById('pos-th');
+  const tb = document.getElementById('pos-tb');
+  tb.innerHTML = '';
+
+  if (av !== null) {
+    // Mode A — single result: invest available amount at CMP right now
+    const sb   = Math.floor(av / cmp);
+    const tot  = os + sb;
+    const tInv = inv + av;
+    const avg  = tInv / tot;
+    const pv   = tot * cmp;
+    const prof = pv - tInv;
+    const ret  = (prof / tInv) * 100;
+
+    document.getElementById('pos-note').textContent = 'Result of investing ₹' + rn(av) + ' at current CMP of ' + fmt(cmp);
+    th.innerHTML = '';
+    tb.innerHTML = '';
+    document.querySelector('#pos-res .tbl-card').style.display = 'none';
+    document.getElementById('pos-sum').innerHTML +=
+      sc('Shares You Can Buy', rs(sb) + ' shares') +
+      sc('Total Shares After', rs(tot)) +
+      sc('New Avg Cost', fmt(avg)) +
+      sc('Portfolio Value', fmt(pv)) +
+      sc('Total Profit ₹', fmt(prof), 'grn') +
+      sc('New Return %', '+' + rn(ret) + '%', 'grn');
+
+  } else {
+    // Mode B — ₹ needed to achieve each return target
+    document.querySelector('#pos-res .tbl-card').style.display = '';
+    document.getElementById('pos-note').textContent = 'How much to invest at CMP to reach each return target';
+    th.innerHTML = `<th>Target Return</th><th>₹ to Invest at CMP</th><th>Shares to Buy</th><th>Total Shares</th><th>New Avg Cost</th><th>Resulting Return</th>`;
+
+    const start = Math.floor(pnl / 5) * 5;
+    const targets = [];
+    for (let t = start; t >= 5; t -= 5) targets.push(t);
+
+    let added = 0;
+    targets.forEach(tp => {
+      const reqAvg = cmp / (1 + tp / 100);
+      if (reqAvg <= buy || reqAvg >= cmp) return;
+      const num   = reqAvg * os - inv;
+      const den   = 1 - reqAvg / cmp;
+      if (den === 0) return;
+      const extra = num / den;
+      if (extra < 0) return;
+
+      const eS   = extra / cmp;
+      const totS = os + eS;
+      const totI = inv + extra;
+      const na   = totI / totS;
+      const ar   = ((cmp - na) / na) * 100;
+
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td class="grn bold">+${tp}%</td>
+        <td class="bold">${fmt(extra)}</td>
+        <td>${rs(eS)}</td>
+        <td>${rs(totS)}</td>
+        <td>${fmt(na)}</td>
+        <td class="grn">+${rn(ar)}%</td>`;
+      tb.appendChild(tr);
+      added++;
+    });
+
+    if (added === 0) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td colspan="6" style="color:#999;padding:16px;text-align:center;font-size:13px;">
+        Buying more at CMP (${fmt(cmp)}) above your buy price (${fmt(buy)}) raises your average cost, which reduces % return. Consider whether the added position is worth it.
+      </td>`;
+      tb.appendChild(tr);
+    }
+  }
+
+  document.getElementById('pos-res').classList.remove('hidden');
+  document.getElementById('pos-res').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ===== PRICE TARGETS =====
+function calcTargets() {
+  const price = parseFloat(document.getElementById('tp').value);
+  if (!price || price <= 0) { document.getElementById('tgt-res').classList.add('hidden'); return; }
+
+  document.getElementById('tgt-res').classList.remove('hidden');
+
+  // Update diagram
+  const sl    = price * 0.75;
+  const slTrg = price * 0.79;
+  const tgt   = price * 2.00;
+  const tgtTrg= price * 2.04;
+  document.getElementById('diag-buy').textContent         = fmt(price);
+  document.getElementById('diag-sl').textContent          = fmt(sl);
+  document.getElementById('diag-sl-trigger').textContent  = fmt(slTrg);
+  document.getElementById('diag-target').textContent      = fmt(tgt);
+  document.getElementById('diag-target-trigger').textContent = fmt(tgtTrg);
+
+  const levels = [-25, 5, 30, 55, 80, 100];
+
+  document.getElementById('tgt-cards').innerHTML = levels.map(pct => {
+    const tp      = price * (1 + pct / 100);
+    const change  = tp - price;
+    const isNeg   = pct < 0;
+    const col     = isNeg ? '#c00' : '#060';
+    const sign    = isNeg ? '' : '+';
+    const show2nd = true;
+    const pct2    = pct + 4;
+    const tp2     = price * (1 + pct2 / 100);
+    const change2 = tp2 - price;
+    const sign2   = pct2 < 0 ? '' : '+';
+    const label1  = pct === 100 ? 'Target Price' : 'Stop Loss Price';
+
+    return `
+      <div class="tgt-card">
+        <div class="tgt-pct" style="color:${col};">${sign}${pct}%</div>
+        <div style="font-size:11px;font-weight:600;color:#888;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.4px;">${label1}</div>
+        <div class="tgt-price" style="color:${col};">${fmt(tp)}</div>
+        <div class="tgt-chg">${sign}${fmt(change)}</div>
+        <div style="margin-top:10px;padding-top:10px;border-top:1px solid #eee;">
+          <div class="tgt-pct" style="color:#888;">${sign2}${pct2}%</div>
+          <div style="font-size:11px;font-weight:600;color:#888;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.4px;">Trigger Price</div>
+          <div class="tgt-price" style="font-size:18px;color:#555;">${fmt(tp2)}</div>
+          <div class="tgt-chg">${sign2}${fmt(change2)}</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+</script>
+</body>
+</html>
